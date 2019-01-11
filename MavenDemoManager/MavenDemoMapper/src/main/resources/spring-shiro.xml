@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+						http://www.springframework.org/schema/context
+					    http://www.springframework.org/schema/context/spring-context.xsd
+					    http://www.springframework.org/schema/aop
+					    http://www.springframework.org/schema/aop/spring-aop.xsd
+					    http://www.springframework.org/schema/tx
+					    http://www.springframework.org/schema/tx/spring-tx.xsd" >
+<!--shiro的过滤器配置 id必须与web.xml 中的targetBeanName保持一致 -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<!--将安全管理器注入 Filter工厂-->
+		<property name="securityManager" ref="securityManager"></property>
+		<!--修改默认的登录页面-->
+		<property name="loginUrl" value="/login.jsp"></property>
+		<!--过滤链配置-->
+		<property name="filterChainDefinitions">
+			<value>
+				<!--shiro的拦截策略
+				  authc  认证过滤器的缩写
+				  /** = authc   所有请求都得认证通过后才能访问
+				        anon   匿名过滤器缩写
+				   过滤策略  有先后顺序的
+				       logout    登出过滤器缩写  不需要写控制器代码
+				-->
+				  /sysAdmin/login.do = anon
+				 /admin/** =  anon
+				 /image/** = anon
+				/css/** = anon
+				/themes/** = anon
+				/js/** = anon
+				/index.jsp = anon
+				/main.jsp = anon
+				/login.jsp = anon
+				/user/logout.do = logout
+				/** = authc
+			</value>
+		</property>
+	</bean>
+<!--shiro的安全管理器-->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<!--将Realm注入安全管理器-->
+		<property name="realm" ref="myRealm"></property>
+	</bean>
+	<!--自定义realm-->
+	<bean id="myRealm" class="com.yunkan.realm.MyRealmByAuthor">
+		<!--更换凭证匹配器-->
+		<property name="credentialsMatcher" ref="credentialsMatcher"></property>
+	</bean>
+	<!--加密凭证匹配器-->
+	<bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+		<!--指定加密策略-->
+		<property name="hashAlgorithmName" value="md5"></property>
+		<!--指定加密次数-->
+		<property name="hashIterations" value="1"></property>
+	</bean>
+	<!--将代理模式改为cglib-->
+	<!--<aop:config proxy-target-class="true"></aop:config>-->
+	<!--开启shiro注解-->
+	<bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager"></property>
+	</bean>
+</beans>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yunkan.dao.SysResourcesDao">
+    <!-- SysResources的resultMap,column是给数据库列起的别名,它对应property类的属性-->
+    <resultMap id="result_SysResources_Map" type="com.yunkan.entity.SysResources">
+        <id column="id" property="id" />
+        <result column="res_code" property="resCode" />
+        <result column="res_name" property="text" />
+        <result column="parent_id" property="parentId" />
+        <result column="res_url" property="resUrl" />
+        <result column="res_icon" property="resIcon" />
+        <result column="res_type" property="resType" />
+        <result column="sort_no" property="sortNo" />
+        <result column="status" property="status" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="enable_" property="enable" />
+    </resultMap>
+
+    <resultMap id="result_Main_SysResources_Map" type="com.yunkan.entity.SysResources">
+        <id column="id" property="id" />
+        <result column="res_code" property="resCode" />
+        <result column="res_name" property="text" />
+        <result column="parent_id" property="parentId" />
+        <result column="res_url" property="resUrl" />
+        <result column="res_icon" property="resIcon" />
+        <result column="res_type" property="resType" />
+        <result column="sort_no" property="sortNo" />
+        <result column="status" property="status" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="enable_" property="enable" />
+        <collection property="children" ofType="com.yunkan.entity.SysResources">
+            <id column="childId" property="id" />
+            <result column="name" property="text" />
+            <result column="url" property="resUrl" />
+        </collection>
+    </resultMap>
+    <!-- 数据库中表名为:sys_resources的列名,as前是数据库的列明,as后是列的别名用于映射成实体类中的属性,需要注意的是别名必须与resultMap中的column别名一致 -->
+    <sql id="sys_resources_Column">
+        sys_resources.id as id
+        ,sys_resources.res_code as res_code
+        ,sys_resources.res_name as res_name
+        ,sys_resources.parent_id as parent_id
+        ,sys_resources.res_url as res_url
+        ,sys_resources.res_icon as res_icon
+        ,sys_resources.res_type as res_type
+        ,sys_resources.sort_no as sort_no
+        ,sys_resources.status as status
+        ,sys_resources.create_by as create_by
+        ,sys_resources.create_time as create_time
+        ,sys_resources.enable_ as enable_
+    </sql>
+
+    <!--获得类名为:SysResources对应的数据库表的数据总行数 -->
+    <select id="getSysResourcesRowCount" resultType="java.lang.Long">
+        select count(id) from sys_resources
+    </select>
+    <!-- 获得类名为:SysResources对应数据库中表的数据集合 -->
+    <select id="selectSysResources" resultMap="result_SysResources_Map">
+        select 
+        <include refid="sys_resources_Column" /> 
+        from sys_resources
+    </select> 
+
+    <!-- 获得一个SysResources对象,以参数SysResources对象中不为空的属性作为条件进行查询-->
+    <select id="selectSysResourcesByObj" parameterType="com.yunkan.entity.SysResources" resultMap="result_SysResources_Map">
+        select 
+            <include refid="sys_resources_Column" /> 
+        from sys_resources
+        <where>
+            <if test="enable != null "> and sys_resources.enable_ = #{enable}</if>
+            <if test="createTime != null "> and sys_resources.create_time = #{createTime}</if>
+            <if test="createBy != null "> and sys_resources.create_by = #{createBy}</if>
+            <if test="status != null "> and sys_resources.status = #{status}</if>
+            <if test="sortNo != null "> and sys_resources.sort_no = #{sortNo}</if>
+            <if test="resType != null "> and sys_resources.res_type = #{resType}</if>
+            <if test="resIcon != null "> and sys_resources.res_icon = #{resIcon}</if>
+            <if test="resUrl != null "> and sys_resources.res_url = #{resUrl}</if>
+            <if test="parentId != null "> and sys_resources.parent_id = #{parentId}</if>
+            <if test="resName != null "> and sys_resources.res_name = #{resName}</if>
+            <if test="resCode != null "> and sys_resources.res_code = #{resCode}</if>
+            <if test="id != null "> and sys_resources.id = #{id}</if>
+        </where>
+    </select> 
+
+    <!-- 通过SysResources的id获得对应数据库中表的数据对象-->
+    <select id="selectSysResourcesById" parameterType="java.lang.Long" resultMap="result_SysResources_Map">
+        select 
+            <include refid="sys_resources_Column" /> 
+        from sys_resources
+        where sys_resources.id = #{id}
+    </select> 
+
+    <!-- 将SysResources插入到对应数据库的表中,包括属性值为null的数据-->
+
+    <insert id="insertSysResources" parameterType="com.yunkan.entity.SysResources">
+        insert into sys_resources(id,res_code,res_name,parent_id,res_url,res_icon,res_type,sort_no,status,create_by,create_time,enable_) 
+        values(#{id},#{resCode},#{resName},#{parentId},#{resUrl},#{resIcon},#{resType},#{sortNo},#{status},#{createBy},#{createTime},#{enable})
+    </insert>
+
+    <!-- 将SysResources中属性值不为null的数据,插入到对应数据库的表中-->
+    <insert id="insertNonEmptySysResources" parameterType="com.yunkan.entity.SysResources">
+        insert into sys_resources
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="resCode != null">res_code,</if>
+            <if test="resName != null">res_name,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="resUrl != null">res_url,</if>
+            <if test="resIcon != null">res_icon,</if>
+            <if test="resType != null">res_type,</if>
+            <if test="sortNo != null">sort_no,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="enable != null">enable_,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null"> #{id},</if>
+            <if test="resCode != null"> #{resCode},</if>
+            <if test="resName != null"> #{resName},</if>
+            <if test="parentId != null"> #{parentId},</if>
+            <if test="resUrl != null"> #{resUrl},</if>
+            <if test="resIcon != null"> #{resIcon},</if>
+            <if test="resType != null"> #{resType},</if>
+            <if test="sortNo != null"> #{sortNo},</if>
+            <if test="status != null"> #{status},</if>
+            <if test="createBy != null"> #{createBy},</if>
+            <if test="createTime != null"> #{createTime},</if>
+            <if test="enable != null"> #{enable},</if>
+        </trim>
+    </insert>
+
+    <!-- 通过SysResources的id将数据库表中对应的数据删除-->
+    <delete id="deleteSysResourcesById" parameterType="java.lang.Long">
+        delete from sys_resources
+        where id = #{id}
+    </delete>
+
+    <!-- 通过SysResources的id将SysResources的数据更新到数据库中对应的表,包括值null的数据-->
+    <update id="updateSysResourcesById" parameterType="com.yunkan.entity.SysResources">
+        update sys_resources set
+            res_code=#{resCode}
+            ,res_name=#{resName}
+            ,parent_id=#{parentId}
+            ,res_url=#{resUrl}
+            ,res_icon=#{resIcon}
+            ,res_type=#{resType}
+            ,sort_no=#{sortNo}
+            ,status=#{status}
+            ,create_by=#{createBy}
+            ,create_time=#{createTime}
+            ,enable_=#{enable}
+        where id=#{id}
+    </update>
+
+    <!-- 通过SysResources的id将SysResources中属性值不为null的数据更新到数据库对应的表中-->
+    <update id="updateNonEmptySysResourcesById" parameterType="com.yunkan.entity.SysResources">
+        update sys_resources
+        <set>
+            <if test="resCode != null">
+                res_code=#{resCode},
+            </if>
+            <if test="resName != null">
+                res_name=#{resName},
+            </if>
+            <if test="parentId != null">
+                parent_id=#{parentId},
+            </if>
+            <if test="resUrl != null">
+                res_url=#{resUrl},
+            </if>
+            <if test="resIcon != null">
+                res_icon=#{resIcon},
+            </if>
+            <if test="resType != null">
+                res_type=#{resType},
+            </if>
+            <if test="sortNo != null">
+                sort_no=#{sortNo},
+            </if>
+            <if test="status != null">
+                status=#{status},
+            </if>
+            <if test="createBy != null">
+                create_by=#{createBy},
+            </if>
+            <if test="createTime != null">
+                create_time=#{createTime},
+            </if>
+            <if test="enable != null">
+                enable_=#{enable},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+    <select id="findByParentId" resultMap="result_SysResources_Map">
+        select *
+        from sys_resources
+        where parent_id = 0
+        order by sort_no
+    </select>
+    <select id="selectMeau" resultMap="result_Main_SysResources_Map">
+        select t1.*,t2.id childId,t2.res_name name,t2.res_url url
+        from sys_resources t1
+        LEFT JOIN sys_resources t2
+        on t1.id=t2.parent_id
+        where t1.parent_id=0
+        order by t1.sort_no asc
+    </select>
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:tx="http://www.springframework.org/schema/tx"
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			">
+	<!--扫描service类的注解-->
+	<context:component-scan base-package="com.yunkan.service"></context:component-scan>
+	<!--引入Spring-dao配置文件-->
+	<import resource="classpath*:applicationContext-dao.xml"/>
+
+	<!--引入日志切面-->
+	<bean id="myAop" class="com.yunkan.aop.LogAop"></bean>
+	<!--声明式事物,指定事物管理器-->
+	<bean class = "org.springframework.jdbc.datasource.DataSourceTransactionManager" id = "txManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!--指定事物的切面以及切入规则-->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="set*" read-only="true"/>
+			<tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
+			<tx:method name="add*" isolation="READ_COMMITTED" propagation="REQUIRED" />
+			<tx:method name="modify*" isolation="READ_COMMITTED" propagation="REQUIRED"/>
+			<tx:method name="remove*" isolation="READ_COMMITTED" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+
+	<!--<tx:attributes>
+        防止脏读
+        事物隔离性
+        isolation="READ_COMMITTED"
+        事物传播性
+        当操作过程存在事物，则融入当前事物，如果没有，则创建事物
+        propagation="REQUIRED"
+        当操作过程存在事物，则融入当前事物，如果没有，那就没有。
+        propagation="SUPPORTS"
+</tx:attributes>-->
+
+	<aop:config>
+		<!--声明切入点，指定切入点表达式-->
+		<aop:pointcut id="servicePointCut" expression="execution(* com.yunkan.service.*.*(..))"/>
+		<!--切面与切入点编织-->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="servicePointCut" order="9"/>
+		<aop:advisor advice-ref="myAop" pointcut-ref="servicePointCut" order="1"/>
+	</aop:config>
+	
+</beans>

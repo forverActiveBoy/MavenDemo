@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:mvc="http://www.springframework.org/schema/mvc"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			">
+	<!-- 通过注解完成 -->
+	<!-- 1.把方法映射成一个地址 -->
+	<!-- a.加载controller注解 -->
+	<context:component-scan base-package="com.yunkan.controller"></context:component-scan>
+	
+	<!-- 通过mvc标签完成@RequestMapping注解的加载 -->
+	<mvc:annotation-driven/>
+	
+	<!-- 2.流程跳转 -->
+	<!-- 通过视图解析器,解析逻辑视图名==>转换成物理视图,通过转发的方式请求物理视图 -->
+	<!-- 通过bean标签,配置视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	<!-- 拿到逻辑视图,添加一个前缀,添加一个后缀,形成物理视图 ;以转发的方式请求物理视图-->
+
+
+	<!-- 容器默认的DefaultServletHandler处理 所有静态内容与无RequestMapping处理的URL -->
+	<mvc:default-servlet-handler />
+</beans>
+
